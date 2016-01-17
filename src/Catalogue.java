@@ -89,8 +89,9 @@ public class Catalogue implements I_Catalogue {
 		}
 		if (cpt < this.lesProduits.size()){
 			verif = this.lesProduits.get(cpt).ajouter(qteAchetee);
-
+			if (verif) {
 				monProduitDAO.modifierProduit(this.lesProduits.get(cpt));
+			}
 
 		}
 		return verif;
@@ -105,7 +106,9 @@ public class Catalogue implements I_Catalogue {
 		}
 		if (cpt < this.lesProduits.size()){
 			verif = this.lesProduits.get(cpt).enlever(qteVendue);
-			monProduitDAO.modifierProduit(this.lesProduits.get(cpt));
+			if (verif) {
+				monProduitDAO.modifierProduit(this.lesProduits.get(cpt));
+			}
 		}
 		return verif;
 	}

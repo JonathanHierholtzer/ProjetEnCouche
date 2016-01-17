@@ -1,17 +1,17 @@
 public class Controleur {
 
-    private static Catalogue cat;
+    private static Catalogue catalogue;
 
     public Controleur() {
-        this.cat = new Catalogue();
+        this.catalogue = new Catalogue();
     }
 
     public Catalogue getCatalogue() {
-        return this.cat;
+        return this.catalogue;
     }
 
     public void deconnexionBD() {
-        //this.connexionBD.deconnexion();
+//        catalogue.
     }
 
 

@@ -5,29 +5,29 @@ import java.util.List;
 
 public class ProduitDAOOracle implements I_ProduitDAO {
 
-    private String cheminScriptBDD = "/Users/John/Documents/Cours/ACPI/ProjetBDUML/ProjetEnCouche/src/script.sql";
     private Connection cn = null;
     private Statement st = null;
     private ResultSet rs = null;
     private PreparedStatement pst = null;
     private CallableStatement cst = null;
 
+    private String driver = "oracle.jdbc.driver.OracleDriver";
+    //private String url= "jdbc:oracle:thin:@gloin:1521:iut";
+    private String url= "jdbc:oracle:thin:@162.38.222.149:1521:iut";
+    private String login= "meyrueixo";
+    private String mdp= "1104022264A";
+
     public ProduitDAOOracle() {
-        String driver = "oracle.jdbc.driver.OracleDriver";
-        String url = "jdbc:oracle:thin:@gloin:1521:iut";
-        String urlExterne = "jdbc:oracle:thin:@162.38.222.149:1521:iut";
-        String login = "meyrueixo";
-        String mdp = "1104022264A";
-        connexionBDD(driver, urlExterne, login, mdp);
+        connexionBDD();
+        deconnexion();
     }
 
 
-    private void connexionBDD(String driver, String urlExterne, String login, String mdp) {
+    private void connexionBDD() {
         try {
-            Class.forName(driver);
-            cn = DriverManager.getConnection(urlExterne, login, mdp);
-            st = cn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
-            //rs = st.executeQuery("SELECT * FROM Produit ORDER BY(nomProduit)");
+            Class.forName(this.driver);
+            cn = DriverManager.getConnection(this.url, this.login, this.mdp);
+
         } catch (SQLException e) {
             System.out.println(e.getMessage());
             e.printStackTrace();
@@ -38,9 +38,12 @@ public class ProduitDAOOracle implements I_ProduitDAO {
     }
 
     public boolean ajoutProduit(I_Produit produit) {
+        connexionBDD();
         try {
             cst = cn.prepareCall("{call nouveauProduit(" + produit.getNom() + "," + produit.getPrixUnitaireHT() + "," + produit.getQuantite() + ")}");
-            if (cst.execute()) {
+            boolean estExecute = cst.execute();
+            deconnexion();
+            if (estExecute) {
                 System.out.println("Produit ajouté");
                 return true;
             }
@@ -55,13 +58,15 @@ public class ProduitDAOOracle implements I_ProduitDAO {
 
     @Override
     public boolean modifierProduit(I_Produit produit) {
+        connexionBDD();
         try {
             pst = cn.prepareStatement("SELECT * FROM Produit WHERE nomProduit =?");
             pst.setString(1,produit.getNom());
             rs = pst.executeQuery();
+            deconnexion();
             if (rs.next()){
-                rs.updateDouble(2,produit.getPrixUnitaireHT());
-                rs.updateInt(3,produit.getQuantite());
+                rs.updateDouble(3,produit.getPrixUnitaireHT());
+                rs.updateInt(4,produit.getQuantite());
                 rs.updateRow();
                 return true;
             }
@@ -78,10 +83,12 @@ public class ProduitDAOOracle implements I_ProduitDAO {
 
     @Override
     public boolean supprimerProduit(I_Produit produit) {
+        connexionBDD();
         try {
             pst = cn.prepareStatement("SELECT * FROM Produit WHERE nomProduit =?");
             pst.setString(1,produit.getNom());
             rs = pst.executeQuery();
+            deconnexion();
             if (rs.next()){
                 rs.deleteRow();
                 return true;
@@ -99,12 +106,14 @@ public class ProduitDAOOracle implements I_ProduitDAO {
 
     @Override
     public I_Produit recupererProduit(String nom) {
+        connexionBDD();
         try {
             pst = cn.prepareStatement("SELECT * FROM Produit WHERE nomProduit =?");
             pst.setString(1,nom);
             rs = pst.executeQuery();
+            deconnexion();
             if (rs.next()){
-                I_Produit produit = new Produit(rs.getString(1),rs.getDouble(2),rs.getInt(3));
+                I_Produit produit = new Produit(rs.getString(2),rs.getDouble(3),rs.getInt(4));
                 return produit;
             }
             else {
@@ -120,14 +129,18 @@ public class ProduitDAOOracle implements I_ProduitDAO {
 
     @Override
     public List<I_Produit> recupererTousLesProduits() {
+        connexionBDD();
         try {
+            st = cn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
             rs = st.executeQuery("SELECT * FROM Produit ORDER BY(nomProduit)");
+            deconnexion();
             List<I_Produit> maListeDeProduits = new ArrayList<I_Produit>();
             while (rs.next()){
-                I_Produit produit = new Produit(rs.getString(1),rs.getDouble(2),rs.getInt(3));
+                I_Produit produit = new Produit(rs.getString(2),rs.getDouble(3),rs.getInt(4));
                 maListeDeProduits.add(produit);
             }
             return maListeDeProduits;
+
 
 
         } catch (SQLException e) {
@@ -141,7 +154,17 @@ public class ProduitDAOOracle implements I_ProduitDAO {
 
     public void deconnexion() {
         try {
+            rs.close();
+            rs = null;
+            st.close();
+            st = null;
+            pst.close();
+            pst =null;
+            cst.close();
+            cst =null;
             cn.close();
+            cn=null;
+
         } catch (Exception e) {
             e.printStackTrace();
         }

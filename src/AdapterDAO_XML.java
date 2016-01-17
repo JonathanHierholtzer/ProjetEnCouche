@@ -1,8 +1,5 @@
 import java.util.List;
 
-/**
- * Created by John on 17/01/2016.
- */
 public class AdapterDAO_XML implements I_ProduitDAO{
 
     private ProduitDAO_XML monProduitDAO_XML;

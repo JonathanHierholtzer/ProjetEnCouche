@@ -1,10 +1,10 @@
-import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class CatalogueTest {
 
@@ -13,9 +13,12 @@ I_Catalogue cat;
 	@Before
 	public void setUp() {
 		cat = new Catalogue();
+		cat.clear();
 //		Si votre Catalogue est un Singleton, il faut changer la ligne pr�c�dente puis vider le Catalogue avec la m�thode clear() comme indiqu� � la ligne suivante
 //		cat.clear();
 	}
+
+
 	
 	@Test
 	public void testCatalogue(){
