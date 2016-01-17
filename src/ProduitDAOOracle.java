@@ -1,4 +1,5 @@
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -26,8 +27,7 @@ public class ProduitDAOOracle implements I_ProduitDAO {
             Class.forName(driver);
             cn = DriverManager.getConnection(urlExterne, login, mdp);
             st = cn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
-            //resetBDD();
-            rs = st.executeQuery("SELECT * FROM Produit ORDER BY(nomProduit)");
+            //rs = st.executeQuery("SELECT * FROM Produit ORDER BY(nomProduit)");
         } catch (SQLException e) {
             System.out.println(e.getMessage());
             e.printStackTrace();
@@ -44,7 +44,9 @@ public class ProduitDAOOracle implements I_ProduitDAO {
                 System.out.println("Produit ajouté");
                 return true;
             }
-            else return false;
+            else {
+                return false;
+            }
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
@@ -53,97 +55,89 @@ public class ProduitDAOOracle implements I_ProduitDAO {
 
     @Override
     public boolean modifierProduit(I_Produit produit) {
+        try {
+            pst = cn.prepareStatement("SELECT * FROM Produit WHERE nomProduit =?");
+            pst.setString(1,produit.getNom());
+            rs = pst.executeQuery();
+            if (rs.next()){
+                rs.updateDouble(2,produit.getPrixUnitaireHT());
+                rs.updateInt(3,produit.getQuantite());
+                rs.updateRow();
+                return true;
+            }
+            else {
+                return false;
+            }
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
     @Override
     public boolean supprimerProduit(I_Produit produit) {
+        try {
+            pst = cn.prepareStatement("SELECT * FROM Produit WHERE nomProduit =?");
+            pst.setString(1,produit.getNom());
+            rs = pst.executeQuery();
+            if (rs.next()){
+                rs.deleteRow();
+                return true;
+            }
+            else {
+                return false;
+            }
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
     @Override
     public I_Produit recupererProduit(String nom) {
+        try {
+            pst = cn.prepareStatement("SELECT * FROM Produit WHERE nomProduit =?");
+            pst.setString(1,nom);
+            rs = pst.executeQuery();
+            if (rs.next()){
+                I_Produit produit = new Produit(rs.getString(1),rs.getDouble(2),rs.getInt(3));
+                return produit;
+            }
+            else {
+                return null;
+            }
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
     @Override
     public List<I_Produit> recupererTousLesProduits() {
+        try {
+            rs = st.executeQuery("SELECT * FROM Produit ORDER BY(nomProduit)");
+            List<I_Produit> maListeDeProduits = new ArrayList<I_Produit>();
+            while (rs.next()){
+                I_Produit produit = new Produit(rs.getString(1),rs.getDouble(2),rs.getInt(3));
+                maListeDeProduits.add(produit);
+            }
+            return maListeDeProduits;
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
 
-    /*public void resetBDD() {
-        dropTable("Produit");
-        creerTableProduit();
-        dropSequenceProduit();
-        creerSequenceProduit();
-        creerProcedureNouveauProduit();
 
-    }
-
-    private void creerProcedureNouveauProduit() {
-        String requete = "CREATE OR REPLACE PROCEDURE nouveauProduit ("
-                + "p_nomProduit IN Produit.nomProduit%TYPE,"
-                + "p_prixProduit IN Produit.prixProduit%TYPE,"
-                + "p_qteProduit IN Produit.qteProduit%TYPE) IS "
-                + "BEGIN "
-                + "INSERT INTO Produit (codeProduit, nomProduit, prixProduit, qteProduit) "
-                + "VALUES (seqProd.NEXTVAL, p_nomProduit, p_prixProduit, p_qteProduit);"
-                + "END;";
-        executerRequeteDeMaJ(requete);
-    }
-
-    private void creerSequenceProduit() {
-        String requete = "CREATE SEQUENCE seqProd START WITH 1 INCREMENT BY 1";
-        executerRequeteDeMaJ(requete);
-
-    }
-
-    private void dropSequenceProduit() {
-        String requete = "DROP SEQUENCE seqPROD";
-        executerRequeteDeMaJ(requete);
-    }
-
-    private void creerTableProduit() {
-        String requete = "CREATE TABLE Produit ("
-                + "codeProduit NUMBER(10), "
-                + "nomProduit VARCHAR(20), "
-                + "prixProduit FLOAT(10), "
-                + "qteProduit NUMBER(10), "
-                + "CONSTRAINT pk_produit PRIMARY KEY (codeProduit), "
-                + "CONSTRAINT nn_qteProduit CHECK (qteProduit IS NOT NULL)"
-                + ")";
-
-        executerRequeteDeMaJ(requete);
-    }
-
-    private void dropTable(String table) {
-        String requete = "DROP TABLE " + table + " CASCADE CONSTRAINTS";
-        executerRequeteDeMaJ(requete);
-    }*/
-
-    private void executerRequeteDeMaJ(String requete) {
-        try {
-            st.executeUpdate(requete);
-        } catch (SQLException e) {
-
-            System.out.println(e.getMessage());
-            e.printStackTrace();
-
-        }
-    }
-
-
-
-    /*private boolean laTableExisteDansLaBDD(SQLException e) {
-        boolean tableExiste = e.getErrorCode() != 942;
-        return tableExiste;
-    }
-
-    private boolean laSequenceExisteDansLaBDD(SQLException e) {
-        boolean sequenceExiste = e.getErrorCode() != 2289;
-        return sequenceExiste;
-    }*/
 
     public void deconnexion() {
         try {
