@@ -1,15 +1,17 @@
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 
 public class Catalogue implements I_Catalogue {
 
-	private ArrayList<I_Produit> lesProduits;
+	private List<I_Produit> lesProduits;
+	private ProduitDAOFactory maFactory = new ProduitDAOFactory();
+	private I_ProduitDAO monProduitDAO;
 	
 	public Catalogue() {
-		this.lesProduits = new ArrayList<I_Produit>();
+		this.monProduitDAO = maFactory.createProduitDAO("XML");
+		this.lesProduits = monProduitDAO.recupererTousLesProduits();
 	}
 	
 	@Override
@@ -23,6 +25,7 @@ public class Catalogue implements I_Catalogue {
 				}
 				if (cpt>=this.lesProduits.size()){
 					this.lesProduits.add(produit);
+					this.monProduitDAO.ajoutProduit(produit);
 					verif = true;
 				}
 		}
@@ -41,7 +44,7 @@ public class Catalogue implements I_Catalogue {
 				if (cpt>=this.lesProduits.size()){
 					Produit p1 = new Produit(nom,prix,qte);
 					this.lesProduits.add(p1);
-					//connexionBD.ajoutProduit(nom, prix, qte);
+					monProduitDAO.ajoutProduit(p1);
 					verif = true;
 				}
 		}
@@ -69,7 +72,9 @@ public class Catalogue implements I_Catalogue {
 			cpt++;
 		}
 		if (cpt < this.lesProduits.size()){
+			monProduitDAO.supprimerProduit(this.lesProduits.get(cpt));
 			this.lesProduits.remove(cpt);
+
 			verif = true;
 		}
 		return verif;
@@ -84,6 +89,9 @@ public class Catalogue implements I_Catalogue {
 		}
 		if (cpt < this.lesProduits.size()){
 			verif = this.lesProduits.get(cpt).ajouter(qteAchetee);
+
+				monProduitDAO.modifierProduit(this.lesProduits.get(cpt));
+
 		}
 		return verif;
 	}
@@ -97,6 +105,7 @@ public class Catalogue implements I_Catalogue {
 		}
 		if (cpt < this.lesProduits.size()){
 			verif = this.lesProduits.get(cpt).enlever(qteVendue);
+			monProduitDAO.modifierProduit(this.lesProduits.get(cpt));
 		}
 		return verif;
 	}

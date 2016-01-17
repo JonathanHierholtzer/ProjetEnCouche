@@ -12,16 +12,11 @@ public class ProduitDAOFactory {
             case "Oracle":
                 this.myDAOProduct = new ProduitDAOOracle();
                 break;
-            /*case "XML":
-                this.myDAOProduct = new ProduitDAO_XML();
-                break;*/
+            case "XML":
+                this.myDAOProduct = new AdapterDAO_XML();
+                break;
             default:
                 this.myDAOProduct = new ProduitDAOOracle();
-        }
-        if (serveur == "Oracle") {
-            this.myDAOProduct = new ProduitDAOOracle();
-        } else {
-            this.myDAOProduct = new ProduitDAOOracle();
         }
         return this.myDAOProduct;
     }

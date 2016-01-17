@@ -1,4 +1,5 @@
 import java.sql.*;
+import java.util.List;
 
 
 public class ProduitDAOOracle implements I_ProduitDAO {
@@ -48,6 +49,26 @@ public class ProduitDAOOracle implements I_ProduitDAO {
             e.printStackTrace();
             return false;
         }
+    }
+
+    @Override
+    public boolean modifierProduit(I_Produit produit) {
+        return false;
+    }
+
+    @Override
+    public boolean supprimerProduit(I_Produit produit) {
+        return false;
+    }
+
+    @Override
+    public I_Produit recupererProduit(String nom) {
+        return null;
+    }
+
+    @Override
+    public List<I_Produit> recupererTousLesProduits() {
+        return null;
     }
 
 

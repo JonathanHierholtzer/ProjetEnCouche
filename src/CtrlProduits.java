@@ -1,5 +1,4 @@
-import javax.swing.JTextField;
-
+import java.util.List;
 
 public class CtrlProduits extends Controleur {
 
@@ -9,6 +8,11 @@ public class CtrlProduits extends Controleur {
 	
 	public void ajouterProduit(String nom, double prix, int qte){
 		getCatalogue().addProduit(nom, prix, qte);
+
+	}
+
+	public void ajouterProduits(List<I_Produit> l){
+		getCatalogue().addProduits(l);
 	}
 	
 	public void suprimmerProduit (String nom){

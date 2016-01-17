@@ -9,11 +9,6 @@ public class ProduitDAOTest {
         monProduitDAO = new ProduitDAOOracle();
     }
 
-    /*@Test
-    public void testResetBDD() {
-
-        monProduitDAO.resetBDD();
-    }*/
 
 
 
